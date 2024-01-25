@@ -76,7 +76,7 @@ const ContentFoot = () => {
             hợp với dáng người chuẩn đẹp
           </p>
           <div className="mt-1 flex justify-center">
-            <Image src={img1.src} alt="Image" width="350" preview />
+            <Image src={img1.src} alt="Image" width="350" />
           </div>
           <p className="mt-3">
             Ở Merriman, khách hàng của chúng tôi hoàn toàn yên tâm về chất lượng
@@ -133,7 +133,7 @@ const ContentFoot = () => {
             trong tủ đồ của cánh mày râu.
           </p>
           <div className="mt-1 flex justify-center">
-            <Image src={img2.src} alt="Image" width="350" preview />
+            <Image src={img2.src} alt="Image" width="350" />
           </div>
           <p className="mt-3">
             Với những ưu điểm vượt trội của mình, áo thun nam cao cấp Merriman

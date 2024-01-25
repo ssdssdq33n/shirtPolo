@@ -3,13 +3,7 @@ import img from "./images/aothunnam.webp";
 const Content = () => {
   return (
     <>
-      <Image
-        src={img.src}
-        alt="Image"
-        className="w-full"
-        width="100%"
-        preview
-      />
+      <Image src={img.src} alt="Image" className="w-full" width="100%" />
     </>
   );
 };
