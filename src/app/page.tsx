@@ -1,55 +1,13 @@
 "use client";
-
-import Navbar from "@/components/navbar/navbar";
-import { Button } from "primereact/button";
-import { Card } from "primereact/card";
-import { Image } from "primereact/image";
-import Content from "@/components/content/Content";
-import ContentFoot from "@/components/contentFoot/contentFoot";
-import React, { useRef } from "react";
-import { OverlayPanel } from "primereact/overlaypanel";
+import HomePage from "@/components/home/Home";
+import LienHe from "@/components/lienhe/LienHe";
 
 export default function Home() {
-  const op = useRef<any>(null);
   return (
     <>
-      <div className="bg-[#F5F5F5]">
-        <p
-          className="py-2 text-[13px] opacity-70 text-[#000]"
-          style={{ wordSpacing: "5px !important" }}
-        >
-          Trang chủ / Áo nam / Áo thun nam cao cấp - Áo polo nam cao cấp
-        </p>
-        <div className="grid flex mx-0">
-          <div className="col-3">
-            <Navbar />
-          </div>
-          <div className="col-9">
-            <Content />
-          </div>
-        </div>
-        <div className="mt-3">
-          <ContentFoot />
-        </div>
-        <div
-          className="shadow-6 cursor-pointer flex justify-center items-center justify-content-center w-[60px] h-[60px] border-circle bg-[#eac93d] border-solid border-2 border-[#fff]  fixed bottom-[100px] right-4"
-          onClick={(e) => op.current.toggle(e)}
-        >
-          <div>
-            <i className="pi pi-comments flex justify-center text-[#fff]"></i>
-            <p className="flex justify-center text-[#fff] text-[13px]">
-              Liên hệ
-            </p>
-          </div>
-        </div>
-        <OverlayPanel showCloseIcon ref={op}>
-          <img
-            src={
-              "https://primefaces.org/cdn/primereact/images/product/bamboo-watch.jpg"
-            }
-            alt="Bamboo Watch"
-          ></img>
-        </OverlayPanel>
+      <div>
+        <HomePage />
+        <LienHe />
       </div>
     </>
   );

@@ -147,21 +147,33 @@ export const nodeService = {
     return [
       {
         key: "0",
-        label: "Loại túi",
+        label: "Lọc giá",
         data: "Loại túi",
-        icon: "pi pi-shopping-bag",
+        icon: "pi pi-dollar",
         children: [
           {
             key: "0-0",
-            label: "Không túi",
+            label: "Dưới 300k",
             icon: "pi pi-minus",
-            data: "Không túi",
+            data: "Dưới 300k",
           },
           {
             key: "0-1",
-            label: "Có túi",
+            label: "300k - 700k",
             icon: "pi pi-minus",
-            data: "Có túi",
+            data: "300k - 700k",
+          },
+          {
+            key: "0-2",
+            label: "700k - 1.000k",
+            icon: "pi pi-minus",
+            data: "700k - 1.000k",
+          },
+          {
+            key: "0-3",
+            label: "1.000k - 2.000k",
+            icon: "pi pi-minus",
+            data: "1.000k - 2.000k",
           },
         ],
       },

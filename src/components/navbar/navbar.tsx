@@ -20,7 +20,7 @@ const Navbar = () => {
       <Tree
         selectionMode="single"
         value={options}
-        className="w-full shadow-1"
+        className="w-full shadow-1 danhmuc"
         filter
         filterMode="lenient"
         filterPlaceholder="Danh mục sản phẩm"
