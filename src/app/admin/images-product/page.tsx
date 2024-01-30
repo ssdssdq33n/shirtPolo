@@ -14,9 +14,11 @@ import { useEffect, useState } from "react";
 import ImageProductThaoTac from "./saveOrEdit";
 import { Image } from "primereact/image";
 import {
+  ImageUploadProduct,
   createImageProduct,
   deleteImageProduct,
   getAllImageProduct,
+  getFileImageProduct,
   updateImageProduct,
 } from "./imageService";
 
@@ -27,9 +29,6 @@ const ImageProduct = () => {
   const [visible, setVisible] = useState<boolean>(false);
   const [dataProduct, setDataProduct] = useState<IProduct[]>([]);
   const [filebase64, setFileBase64] = useState<string>("");
-  const [filebase642, setFileBase642] = useState<string>("");
-  const [filebase643, setFileBase643] = useState<string>("");
-  const [filebase644, setFileBase644] = useState<string>("");
   const [productDialog, setProductDialog] = useState<
     AddOrUpdate<Partial<IImage>>
   >({ visible: false, header: "", defaultValues: {} });
@@ -104,60 +103,55 @@ const ImageProduct = () => {
     return <p>{product?.name}</p>;
   };
   const imageBody = (rowData: IImage) => {
+    // getFileImageProduct(rowData.imageProduct)
+    //   .then((res) => {
+    //     console.log(res.config.url);
+    //     rowData.url = res.config.url;
+    //   })
+    //   .catch((err) => console.log(err));
+    // console.log(rowData);
     return (
       <>
-        <Image src={rowData.imageProduct1} alt="image-product" />
+        <Image
+          src={`http://localhost:8080/images/imagesUpload/${rowData.imageProduct}`}
+          width="150"
+          alt="image-product"
+        />
       </>
     );
   };
-  const imageBody2 = (rowData: IImage) => {
-    return (
-      <>
-        <Image src={rowData.imageProduct2} alt="image-product" />
-      </>
-    );
-  };
-  const imageBody3 = (rowData: IImage) => {
-    return (
-      <>
-        <Image src={rowData.imageProduct3} alt="image-product" />
-      </>
-    );
-  };
-  const callbackEditProduct = (data: IImage) => {
+  const callbackEditProduct = (data: any) => {
     console.log(data);
-    // setLoading(true);
-    // updateImageProduct(data.imageId, data).then((res) => {
-    //   if (res) {
-    //     setRenderData(!renderData);
-    //     setProduct([...products]);
-    //     setProductDialog({
-    //       header: "",
-    //       visible: false,
-    //       defaultValues: {},
-    //     });
-    //     setFileBase64("");
-    //     mutate("http://localhost:8080/images");
-    //     toast.success("Chỉnh sửa ảnh sản phẩm thành công !");
-    //   } else {
-    //     toast.error("Không thành công !");
-    //   }
-    // });
+    const formData = new FormData();
+    formData.append("file", data["file1"]["0"]);
+    setLoading(true);
+    updateImageProduct(data["imageId"], formData).then((res) => {
+      if (res) {
+        setRenderData(!renderData);
+        setProduct([...products]);
+        setProductDialog({
+          header: "",
+          visible: false,
+          defaultValues: {},
+        });
+        setFileBase64("");
+        mutate("http://localhost:8080/images");
+        toast.success("Chỉnh sửa ảnh sản phẩm thành công !");
+      } else {
+        toast.error("Không thành công !");
+      }
+      setLoading(false);
+    });
   };
   const handleCallbackAddData = (data: any) => {
-    // console.log(data["file1"]["0"]);
-    let dataCreated: IImage = {
-      file1: data["file1"]["0"],
-      file2: data["file2"]["0"],
-      file3: data["file3"]["0"],
-      file4: data["file4"]["0"],
-      productId: data["productId"],
-    };
-    console.log(dataCreated);
-    if (dataCreated) {
-      setLoading(true);
-      createImageProduct(dataCreated).then((res) => {
+    console.log(data["file1"]["0"]);
+    const formData = new FormData();
+    formData.append("file", data["file1"]["0"]);
+    setLoading(true);
+    createImageProduct(data["productId"], formData)
+      .then((res) => {
         if (res) {
+          console.log(res.data);
           setRenderData(!renderData);
           setProduct([...products]);
           setProductDialog({
@@ -170,8 +164,9 @@ const ImageProduct = () => {
         } else {
           toast.error("Không thành công !");
         }
-      });
-    }
+        setLoading(false);
+      })
+      .catch((err) => console.log(err));
   };
   return (
     <div className="h-full">
@@ -218,7 +213,7 @@ const ImageProduct = () => {
             currentPageReportTemplate={
               "Hiển thị {first} đến {last} trong số {totalRecords} bản ghi"
             }
-            rows={4}
+            rows={2}
             rowsPerPageOptions={[2, 4, 5]}
             className="datatable-responsive mt-2"
             responsiveLayout="scroll"
@@ -232,18 +227,8 @@ const ImageProduct = () => {
             ></Column>
             <Column
               style={{ minWidth: "11rem" }}
-              header="Ảnh sản phẩm 1"
+              header="Ảnh sản phẩm"
               body={imageBody}
-            ></Column>
-            <Column
-              style={{ minWidth: "11rem" }}
-              header="Ảnh sản phẩm 2"
-              body={imageBody2}
-            ></Column>
-            <Column
-              style={{ minWidth: "11rem" }}
-              header="Ảnh sản phẩm 3"
-              body={imageBody3}
             ></Column>
             <Column
               style={{ minWidth: "6rem" }}
@@ -278,12 +263,6 @@ const ImageProduct = () => {
       <ImageProductThaoTac
         filebase64={filebase64}
         setFileBase64={setFileBase64}
-        filebase642={filebase642}
-        setFileBase642={setFileBase642}
-        filebase643={filebase643}
-        setFileBase643={setFileBase643}
-        filebase644={filebase644}
-        setFileBase644={setFileBase644}
         dataProduct={dataProduct}
         visible={productDialog.visible}
         header={productDialog.header}

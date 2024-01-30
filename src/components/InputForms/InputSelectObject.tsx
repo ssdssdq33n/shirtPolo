@@ -11,6 +11,7 @@ const InputSelectedObject = (props: any) => {
     filter = false,
     note = false,
     horizontal = true,
+    disabled = false,
     ...prop
   } = props;
   const keyObject = Object?.keys(options?.[0]);
@@ -37,6 +38,7 @@ const InputSelectedObject = (props: any) => {
         </label>
         <Dropdown
           value={field.value}
+          disabled={disabled}
           onChange={(e) => {
             field.onChange(e.target.value);
           }}

@@ -58,7 +58,7 @@ const ProductThaoTac = (props: any) => {
       >
         <div className="flex flex-wrap justify-content-between gap-5">
           <div className="flex gap-5">
-            <div>
+            <div className="w-[50%]">
               <InputTextObject
                 label={"Tên sản phẩm"}
                 control={control}
@@ -67,12 +67,12 @@ const ProductThaoTac = (props: any) => {
                 note={true}
                 horizontal={false}
               ></InputTextObject>
-              <InputSelectedObject
+              {/* <InputSelectedObject
                 control={control}
                 label={"Size sản phẩm"}
                 name="size"
                 options={dataSize}
-              ></InputSelectedObject>
+              ></InputSelectedObject> */}
               <InputNumberObject
                 label={"Sale sản phẩm"}
                 control={control}
@@ -90,7 +90,7 @@ const ProductThaoTac = (props: any) => {
                 horizontal={false}
               ></InputNumberObject>
             </div>
-            <div className="card w-[40%]">
+            <div className="card w-[50%]">
               <InputTextareaObject
                 name="decription"
                 label={"Mô tả sản phẩm"}
