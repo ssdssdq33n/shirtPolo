@@ -123,6 +123,7 @@ const Products = () => {
           visible: false,
           defaultValues: {},
         });
+        setLoading(false);
         mutate("http://localhost:8080/products");
         toast.success("Chỉnh sửa sản phẩm thành công !");
       } else {
@@ -142,6 +143,7 @@ const Products = () => {
           visible: false,
           defaultValues: {},
         });
+        setLoading(false);
         mutate("http://localhost:8080/products");
         toast.success("Thêm mới sản phẩm thành công !");
       } else {
@@ -204,12 +206,12 @@ const Products = () => {
               style={{ minWidth: "9rem" }}
               header="Tên sản phẩm"
             ></Column>
-            <Column
+            {/* <Column
               style={{ minWidth: "6rem" }}
               field="size"
               header="Kích cỡ"
               body={sizeBody}
-            ></Column>
+            ></Column> */}
             <Column
               style={{ minWidth: "9rem" }}
               field="sale"

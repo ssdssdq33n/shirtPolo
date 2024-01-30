@@ -31,13 +31,8 @@ interface AddOrUpdate<T> {
 
 interface IImage{
     imageId?:number
-    imageProduct1?:string
-    imageProduct2?:string
-    imageProduct3?:string
-    imageProduct4?:string
+    imageProduct?:string
     file1:File
-    file2:File
-    file3:File
-    file4:File
+    url?:any
     productId:number
 }

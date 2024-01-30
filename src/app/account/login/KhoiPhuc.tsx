@@ -106,7 +106,7 @@ const KhoiPhuc = (props: any) => {
             onChange={(e: any) => setNhapLai(e.target.value)}
             className="border-1 border-bluegray-200 bg-[#cacaca] focus:bg-[#fff] w-full mt-2"
           />
-          {!nhaplai.includes(nhaplaimatkhau) && nhaplaimatkhau.length > 0 ? (
+          {!nhaplai.includes(nhaplaimatkhau) && nhaplaimatkhau?.length > 0 ? (
             <p className="text-[red] font-[500] text-[15px]">
               <i className="pi pi-exclamation-triangle"></i> Mật khẩu nhập lại
               không đúng
