@@ -1,4 +1,5 @@
 "use client";
+// "use server";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
@@ -11,13 +12,18 @@ import React, { useRef, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { getEmail } from "../register/userService";
 import XacThucEmail from "./Xacthuc";
+import { useRouter } from "next/navigation";
+import { Session } from "inspector";
+import Cookies from "js-cookie";
+import axios from "axios";
 
 type FormData = {
-  tendangnhap: string;
-  matkhau: string;
+  username: string;
+  password: string;
 };
 const Login = () => {
   const [isEmail, setIsEmail] = useState<boolean>(false);
+  const router = useRouter();
   const {
     register,
     watch,
@@ -25,22 +31,69 @@ const Login = () => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      tendangnhap: "",
-      matkhau: "",
+      username: "",
+      password: "",
     },
   });
   // console.log(watch("username"));
   const handleLogin = (data: any) => {
-    console.log(data);
+    localStorage.clear();
+    Cookies.remove("access-token");
+    Cookies.remove("role-token");
     loginUser(data)
       .then((res) => {
-        if (res.data === "thanh cong") {
-          console.log(true);
+        if (res) {
+          localStorage.setItem("access", res.data.token);
+          localStorage.setItem("username", res.data.message);
+          localStorage.setItem("role", res.data.role);
+          Cookies.set("access-token", res.data.token);
+          Cookies.set("role-token", res.data.role);
+          if (res.data.role !== "ADMIN") {
+            axios
+              .put(
+                "https://api.chatengine.io/users/",
+                {
+                  username: data["username"],
+                  secret: "123456",
+                },
+                {
+                  headers: {
+                    "Private-key": "32544cfa-e537-4f5d-9d29-68ed082cad35",
+                  },
+                }
+              )
+              .then((r) => {
+                axios
+                  .put(
+                    "https://api.chatengine.io/chats/",
+                    {
+                      usernames: ["admin", data["username"]],
+                      title: `Xin chào ${data["username"]}`,
+                      is_direct_chat: false,
+                    },
+                    {
+                      headers: {
+                        "Project-ID": "2f9518a5-9f13-4be0-9e34-2eda4e91c9ef",
+                        "User-Name": "admin",
+                        "User-Secret": "123456",
+                      },
+                    }
+                  )
+                  .then((a) => {
+                    console.log(a);
+                  });
+              })
+              .catch((err) => console.log(err));
+          }
+          router.push("/");
         } else {
           toast.error("Tài khoản không tồn tại");
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        toast.error("Tài khoản không tồn tại");
+      });
   };
   const header = (
     <div className="flex mt-4">
@@ -67,35 +120,35 @@ const Login = () => {
             <span className="p-float-label mt-1">
               <InputText
                 type="text"
-                id="tendangnhap"
-                {...register("tendangnhap", {
+                id="username"
+                {...register("username", {
                   required: "Vui lòng nhập vào trường này",
                 })}
                 className="w-full h-3rem border-1 border-bluegray-200 bg-[#cacaca] focus:bg-[#fff]"
               />
-              <label htmlFor="tendangnhap">Username</label>
+              <label htmlFor="username">Username</label>
             </span>
-            {errors.tendangnhap?.message && (
+            {errors.username?.message && (
               <p className="text-[red] font-[500] text-[15px]">
                 <i className="pi pi-exclamation-triangle"></i>{" "}
-                {errors.tendangnhap?.message}
+                {errors.username?.message}
               </p>
             )}
             <span className="p-float-label mt-4">
               <InputText
                 type="password"
-                id="matkhau"
-                {...register("matkhau", {
+                id="password"
+                {...register("password", {
                   required: "Vui lòng nhập vào trường này",
                 })}
                 className="w-full h-3rem border-1 border-bluegray-200 bg-[#cacaca] focus:bg-[#fff]"
               />
               <label htmlFor="password">Password</label>
             </span>
-            {errors.matkhau?.message && (
+            {errors.password?.message && (
               <p className="text-[red] font-[500] text-[15px]">
                 <i className="pi pi-exclamation-triangle"></i>{" "}
-                {errors.matkhau?.message}
+                {errors.password?.message}
               </p>
             )}
             <p className="mt-2">

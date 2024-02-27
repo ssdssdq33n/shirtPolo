@@ -43,7 +43,6 @@ const ProductItem = ({ params }: { params: { id: string } }) => {
     key: "1",
     value: "S",
   });
-  console.log(value);
   let size = dataSize.find((item) => item.key === product?.size);
   const itemTemplate = (item: IImage) => {
     return (

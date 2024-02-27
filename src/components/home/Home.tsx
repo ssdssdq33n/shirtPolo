@@ -31,7 +31,11 @@ import { Dialog } from "primereact/dialog";
 import { Galleria } from "primereact/galleria";
 import { InputNumber } from "primereact/inputnumber";
 import { RadioButton } from "primereact/radiobutton";
-import { postCart, postCartAndNumber } from "../serviceCart/service";
+import {
+  postCart,
+  postCartAndNumber,
+  postCartUser,
+} from "../serviceCart/service";
 import { ToastContainer, toast } from "react-toastify";
 import { mutate } from "swr";
 
@@ -121,18 +125,28 @@ const HomePage = () => {
     );
   };
   const addCart = () => {
-    console.log(dataItem);
-    console.log(selectedSize);
-    postCartAndNumber(selectedSize.value, dataItem, value)
-      .then((res) => {
-        console.log(res.data);
-        if (res) {
-          mutate("http://localhost:8080/products");
-          toast.success("Thêm giỏ hàng thành công !");
-          setVisible(false);
-        }
-      })
-      .catch((err) => console.log(err));
+    if (localStorage.getItem("access") === null) {
+      router.push("/account/login");
+    } else {
+      console.log(dataItem);
+      console.log(selectedSize);
+      console.log(localStorage.getItem("username")?.length);
+      postCartUser(
+        selectedSize.value,
+        dataItem,
+        value,
+        localStorage.getItem("username")
+      )
+        .then((res) => {
+          console.log(res.data);
+          if (res) {
+            mutate("http://localhost:8080/products");
+            toast.success("Thêm giỏ hàng thành công !");
+            setVisible(false);
+          }
+        })
+        .catch((err) => console.log(err));
+    }
   };
   return (
     <>
