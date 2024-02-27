@@ -9,10 +9,42 @@ import { Button } from "primereact/button";
 import { CascadeSelect } from "primereact/cascadeselect";
 import { MegaMenu } from "primereact/megamenu";
 import Link from "next/link";
+import { Badge } from "primereact/badge";
+import { getAllCart } from "../serviceCart/service";
+import { mutate } from "swr";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { ToastContainer, toast } from "react-toastify";
+
 const Header = () => {
   const op = useRef<any>(null);
   const op1 = useRef<any>(null);
+  const [visible, setVisible] = useState<boolean>(false);
   const [selectedCity, setSelectedCity] = useState<any>(null);
+  const [dataCart, setCart] = useState<any>();
+  const router = useRouter();
+  useEffect(() => {
+    getAllCart(localStorage.getItem("username"))
+      .then((res) => {
+        setCart(res.data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+  console.log(dataCart);
+  let total = dataCart?.reduce((tong: any, item: any) => {
+    return tong + item.quantity;
+  }, 0);
+  let mess: string | null = localStorage.getItem("username");
+  // localStorage.removeItem("access");
+  console.log(mess);
+  const handleCart = () => {
+    if (dataCart.length === 0) {
+      toast.error("Bạn chưa có sản phẩm nào trong giỏ hàng !");
+    } else {
+      router.push("/cart");
+    }
+  };
   const countries = [
     {
       name: "Miền Bắc",
@@ -55,6 +87,7 @@ const Header = () => {
   ];
   return (
     <>
+      <ToastContainer />
       <div className="flex grid px-[9%] mx-0 headder">
         <div className="col-2 Anh">
           <Image src={logo.src} alt="Image" width="250px" />
@@ -224,11 +257,41 @@ const Header = () => {
             </div>
           </OverlayPanel>
         </div>
+        <div
+          className="text-[#fff]"
+          onClick={() => {
+            // localStorage.removeItem("access");
+            // localStorage.removeItem("username");
+            // localStorage.removeItem("role");
+            axios
+              .get("http://localhost:8080/logout", {
+                headers: {
+                  // "Content-Type": "application/json",
+                  Authorization: "Bearer " + localStorage.getItem("access"),
+                },
+              })
+              .then((res) => {
+                console.log(res);
+                if (res.status === 200) {
+                  localStorage.clear();
+                  Cookies.remove("role-token");
+                  Cookies.remove("access-token");
+                  router.push("/account/login");
+                }
+              })
+              .catch((err) => console.log(err));
+            // localStorage.clear();
+          }}
+        >
+          dang xuat
+        </div>
         <div className="col-1 GioHang px-2">
-          <span className="p-inputgroup-addon  DiaChi">
-            <i className="pi pi-shopping-cart icon1"></i>
+          <div onClick={handleCart} className="p-inputgroup-addon  DiaChi">
+            <i className="pi pi-shopping-cart p-overlay-badge icon1">
+              <Badge value={total} severity="danger"></Badge>
+            </i>
             <p>Giỏ Hàng</p>
-          </span>
+          </div>
         </div>
       </div>
       <div className="mx-0 my-0 px-[9%] card flex flex-wrap align-items-center justify-content-center">
@@ -303,7 +366,7 @@ const Header = () => {
               <ul>
                 <li>
                   {" "}
-                  <a href="">Phiếu Quà Tặng</a>
+                  <Link href="/phieu-qua-tang">Phiếu Quà Tặng</Link>
                 </li>
               </ul>
             </nav>
@@ -312,7 +375,7 @@ const Header = () => {
             <nav>
               <ul>
                 <li>
-                  <a href="#">Bài Viết</a>
+                  <Link href="/bai-viet">Bài Viết</Link>
                   <ul className="Down">
                     <li>
                       <a href="#">Tin Tức</a>
@@ -333,7 +396,7 @@ const Header = () => {
                   <Link href="/he-thong-cua-hang">Hệ Thống Cửa Hàng</Link>
                   <ul className="Down">
                     <li>
-                      <a href="#">Xem Thêm Chi Tiết</a>
+                      <Link href="/he-thong-cua-hang">Xem Thêm Chi Tiết</Link>
                     </li>
                   </ul>
                 </li>

@@ -23,6 +23,13 @@ interface IProduct{
     price:number;
     categoryId:number
 }
+interface Icart{
+    cartId:number;
+    quantity:number;
+    size:string;
+    username:string;
+    product:IProduct;
+}
 interface AddOrUpdate<T> {
     visible: boolean;
     header?: string;

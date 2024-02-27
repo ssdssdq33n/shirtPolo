@@ -13,6 +13,7 @@ import { getAllProduct } from "../products/ProductService";
 import { useEffect, useState } from "react";
 import ImageProductThaoTac from "./saveOrEdit";
 import { Image } from "primereact/image";
+import { useRouter } from "next/navigation";
 import {
   ImageUploadProduct,
   createImageProduct,
@@ -29,6 +30,7 @@ const ImageProduct = () => {
   const [visible, setVisible] = useState<boolean>(false);
   const [dataProduct, setDataProduct] = useState<IProduct[]>([]);
   const [filebase64, setFileBase64] = useState<string>("");
+  const router = useRouter();
   const [productDialog, setProductDialog] = useState<
     AddOrUpdate<Partial<IImage>>
   >({ visible: false, header: "", defaultValues: {} });
@@ -37,6 +39,12 @@ const ImageProduct = () => {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
   useEffect(() => {
+    if (localStorage.getItem("access") === null) {
+      return router.push("/account/login");
+    }
+    // if (localStorage.getItem("role") !== "ADMIN") {
+    //   return router.push("/errors");
+    // }
     setLoading(true);
     getAllImageProduct()
       .then((res) => {
@@ -144,9 +152,9 @@ const ImageProduct = () => {
     });
   };
   const handleCallbackAddData = (data: any) => {
-    console.log(data["file1"]["0"]);
     const formData = new FormData();
     formData.append("file", data["file1"]["0"]);
+    console.log(formData);
     setLoading(true);
     createImageProduct(data["productId"], formData)
       .then((res) => {
@@ -171,40 +179,42 @@ const ImageProduct = () => {
   return (
     <div className="h-full">
       <ToastContainer />
+      {/* {!isLoading && (
+        <> */}
+      <div className="flex justify-between">
+        <span className="p-input-icon-right w-[30%]">
+          <i className="pi pi-spin pi-spinner" />
+          <InputText
+            onChange={(e) =>
+              setGiatri({
+                ...giatri,
+                global: {
+                  value: e.target.value,
+                  matchMode: FilterMatchMode.CONTAINS,
+                },
+              })
+            }
+            id="name"
+            placeholder=""
+            className="w-full h-full border-1"
+          />
+        </span>
+        <Button
+          label="Thêm mới"
+          className="w-[130px] h-[40px] text-[#fff] bg-[#475569]"
+          onClick={() => {
+            setFileBase64("");
+            setProductDialog({
+              header: "Thêm mới ảnh sản phẩm",
+              visible: true,
+              defaultValues: {},
+            });
+          }}
+        />
+      </div>
       {isLoading && <Loading />}
       {!isLoading && (
         <>
-          <div className="flex justify-between">
-            <span className="p-input-icon-right w-[30%]">
-              <i className="pi pi-spin pi-spinner" />
-              <InputText
-                onChange={(e) =>
-                  setGiatri({
-                    ...giatri,
-                    global: {
-                      value: e.target.value,
-                      matchMode: FilterMatchMode.CONTAINS,
-                    },
-                  })
-                }
-                id="name"
-                placeholder=""
-                className="w-full h-full border-1"
-              />
-            </span>
-            <Button
-              label="Thêm mới"
-              className="w-[130px] h-[40px] text-[#fff] bg-[#475569]"
-              onClick={() => {
-                setFileBase64("");
-                setProductDialog({
-                  header: "Thêm mới ảnh sản phẩm",
-                  visible: true,
-                  defaultValues: {},
-                });
-              }}
-            />
-          </div>
           <DataTable
             filters={giatri}
             value={products}

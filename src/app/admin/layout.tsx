@@ -23,7 +23,7 @@ export default function RegisterLayout({
           <ul className="text-[#fff] text-[16px] font-[600] mt-2">
             <li className="py-4 flex  hover:bg-[#ccc] hover:text-[#000]">
               <Link href={"/admin"}>
-                <i className="pi pi-user mr-2 ml-3"></i>Quản lý khách hàng
+                <i className="pi pi-comments mr-2 ml-3"></i>Chat với khách hàng
               </Link>
             </li>
             <li className="py-4 flex  hover:bg-[#ccc] hover:text-[#000]">

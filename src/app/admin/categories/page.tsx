@@ -15,6 +15,7 @@ import {
 import { mutate } from "swr";
 import { FilterMatchMode } from "primereact/api";
 import { InputText } from "primereact/inputtext";
+import { useRouter } from "next/navigation";
 import CategoryThaoTac from "./saveOrEdit";
 
 const Categories = () => {
@@ -22,6 +23,7 @@ const Categories = () => {
   const [renderData, setRenderData] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [visible, setVisible] = useState<boolean>(false);
+  const router = useRouter();
   const [productDialog, setProductDialog] = useState<
     AddOrUpdate<Partial<ICategory>>
   >({ visible: false, header: "", defaultValues: {} });
@@ -30,9 +32,16 @@ const Categories = () => {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
   useEffect(() => {
+    // if (localStorage.getItem("access") === null) {
+    //   return router.push("/account/login");
+    // }
+    // if (localStorage.getItem("role") !== "ADMIN") {
+    //   return router.push("/errors");
+    // }
     setLoading(true);
     getAllCategories()
       .then((res) => {
+        console.log(res.data);
         setProduct(res.data);
         setLoading(false);
       })
@@ -126,39 +135,41 @@ const Categories = () => {
   return (
     <div className="h-full">
       <ToastContainer />
+      {/* {!isLoading && (
+        <> */}
+      <div className="flex justify-between">
+        <span className="p-input-icon-right w-[30%]">
+          <i className="pi pi-spin pi-spinner" />
+          <InputText
+            onChange={(e) =>
+              setGiatri({
+                ...giatri,
+                global: {
+                  value: e.target.value,
+                  matchMode: FilterMatchMode.CONTAINS,
+                },
+              })
+            }
+            id="name"
+            placeholder="...name"
+            className="w-full h-full border-1"
+          />
+        </span>
+        <Button
+          label="Thêm mới"
+          className="w-[130px] h-[40px] text-[#fff] bg-[#475569]"
+          onClick={() => {
+            setProductDialog({
+              header: "Thêm mới loại sản phẩm",
+              visible: true,
+              defaultValues: {},
+            });
+          }}
+        />
+      </div>
       {isLoading && <Loading />}
       {!isLoading && (
         <>
-          <div className="flex justify-between">
-            <span className="p-input-icon-right w-[30%]">
-              <i className="pi pi-spin pi-spinner" />
-              <InputText
-                onChange={(e) =>
-                  setGiatri({
-                    ...giatri,
-                    global: {
-                      value: e.target.value,
-                      matchMode: FilterMatchMode.CONTAINS,
-                    },
-                  })
-                }
-                id="name"
-                placeholder="...name"
-                className="w-full h-full border-1"
-              />
-            </span>
-            <Button
-              label="Thêm mới"
-              className="w-[130px] h-[40px] text-[#fff] bg-[#475569]"
-              onClick={() => {
-                setProductDialog({
-                  header: "Thêm mới loại sản phẩm",
-                  visible: true,
-                  defaultValues: {},
-                });
-              }}
-            />
-          </div>
           <DataTable
             filters={giatri}
             value={products}

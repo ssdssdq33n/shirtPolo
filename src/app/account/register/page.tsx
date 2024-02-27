@@ -11,13 +11,14 @@ import "./register.css";
 import { createUser, getEmail } from "./userService";
 import { useRouter } from "next/navigation";
 import Loading from "./loading";
+import axios from "axios";
 
 type FormData = {
   name: string;
   email: string;
-  tendangnhap: string;
-  matkhau: string;
-  id: string;
+  username: string;
+  password: string;
+  // id: string;
 };
 const Register = () => {
   const [visible, setVisible] = useState<boolean>(false);
@@ -41,32 +42,32 @@ const Register = () => {
   const {
     register,
     watch,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
       name: "",
       email: "",
-      tendangnhap: "",
-      matkhau: "",
-      id: "2",
+      username: "",
+      password: "",
+      // id: "2",
     },
   });
   const SubmitForm = (data: any) => {
     console.log(data);
     setDulieu(data);
-    setLoading(true);
     getEmail(data)
       .then((res) => {
         console.log(res);
         if (res.data === "ton tai") {
+          reset();
           setIsTen(true);
           setVisible(false);
         } else {
           setVisible(true);
           setSoBack(res.data.toString());
         }
-        setLoading(false);
       })
       .catch((err) => console.log(err));
     // emailjs
@@ -99,6 +100,7 @@ const Register = () => {
   };
   const handleSubmitData = (e: any) => {
     e.preventDefault();
+    console.log(dulieu);
     if (ranDom === undefined) {
       setErr(`Bạn chưa nhập mã`);
     } else if (ranDom.includes(soBack)) {
@@ -108,7 +110,43 @@ const Register = () => {
           console.log(res);
           if (res) {
             setVisible(false);
-            router.push("/account/login");
+            if (dulieu !== undefined) {
+              axios
+                .post(
+                  "https://api.chatengine.io/users/",
+                  {
+                    username: dulieu["username"],
+                    secret: "123456",
+                  },
+                  {
+                    headers: {
+                      "Private-key": "32544cfa-e537-4f5d-9d29-68ed082cad35",
+                    },
+                  }
+                )
+                .then((r) => {
+                  axios
+                    .put(
+                      "https://api.chatengine.io/chats/",
+                      {
+                        usernames: ["admin", dulieu["username"]],
+                        title: `Xin chào ${dulieu["username"]}`,
+                        is_direct_chat: false,
+                      },
+                      {
+                        headers: {
+                          "Project-ID": "2f9518a5-9f13-4be0-9e34-2eda4e91c9ef",
+                          "User-Name": "admin",
+                          "User-Secret": "123456",
+                        },
+                      }
+                    )
+                    .then((a) => {
+                      router.push("/account/login");
+                    });
+                })
+                .catch((err) => console.log(err));
+            }
           }
           setLoading(false);
         })
@@ -187,18 +225,18 @@ const Register = () => {
                   <InputText
                     onFocus={() => setIsTen(false)}
                     type="text"
-                    id="tendangnhap"
-                    {...register("tendangnhap", {
+                    id="username"
+                    {...register("username", {
                       required: "Vui lòng nhập vào trường này",
                     })}
                     className="w-full h-3rem border-1 border-bluegray-200 bg-[#cacaca] focus:bg-[#fff]"
                   />
-                  <label htmlFor="tendangnhap">Username</label>
+                  <label htmlFor="username">Username</label>
                 </span>
-                {errors.tendangnhap?.message && (
+                {errors.username?.message && (
                   <p className="text-[red] font-[500] text-[15px]">
                     <i className="pi pi-exclamation-triangle"></i>{" "}
-                    {errors.tendangnhap?.message}
+                    {errors.username?.message}
                   </p>
                 )}
                 {isTen ? (
@@ -213,8 +251,8 @@ const Register = () => {
                 <span className="p-float-label mt-4">
                   <InputText
                     type="password"
-                    id="matkhau"
-                    {...register("matkhau", {
+                    id="password"
+                    {...register("password", {
                       required: "Vui lòng nhập vào trường này",
                       minLength: {
                         value: 6,
@@ -223,21 +261,21 @@ const Register = () => {
                     })}
                     className="w-full h-3rem border-1 border-bluegray-200 bg-[#cacaca] focus:bg-[#fff]"
                   />
-                  <label htmlFor="matkhau">Password</label>
+                  <label htmlFor="password">Password</label>
                 </span>
-                {errors.matkhau?.message && (
+                {errors.password?.message && (
                   <p className="text-[red] font-[500] text-[15px]">
                     <i className="pi pi-exclamation-triangle"></i>{" "}
-                    {errors.matkhau?.message}
+                    {errors.password?.message}
                   </p>
                 )}
-                <input
+                {/* <input
                   type="hidden"
                   value="2"
                   // onChange={(e) => setRan(e.target.value)}
                   // name="id"
                   {...register("id")}
-                />
+                /> */}
                 <p className="mt-2">
                   This site is protected by reCAPTCHA and the Google{" "}
                   <span className="text-[#009dde]">Privacy Policy </span>
