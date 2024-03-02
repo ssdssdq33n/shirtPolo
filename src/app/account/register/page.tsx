@@ -4,9 +4,10 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import emailjs from "@emailjs/browser";
+import Cookies from "js-cookie";
 import "./register.css";
 import { createUser, getEmail } from "./userService";
 import { useRouter } from "next/navigation";
@@ -54,6 +55,11 @@ const Register = () => {
       // id: "2",
     },
   });
+  useEffect(() => {
+    localStorage.clear();
+    Cookies.remove("access-token");
+    Cookies.remove("role-token");
+  }, []);
   const SubmitForm = (data: any) => {
     console.log(data);
     setDulieu(data);

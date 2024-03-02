@@ -3,7 +3,8 @@ export const nodeHome = {
     return [
       {
         id: 1,
-        description: "Áo sơ mi nam ngắn hàng hiệu Merriman mã...",
+        description:
+          "Áo sơ mi nam tay ngắn hàng hiệu Merriman mã THLXS098 màu xanh Navy",
         price: "812,946",
         sale: "903,273",
         image:

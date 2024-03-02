@@ -22,6 +22,13 @@ export const createProduct = (data: any) =>
       Authorization: "Bearer" + " " + localStorage.getItem("access"),
     },
   });
+export const createProductImport = (data: any) =>
+  axios.post(REST_API_BASE_URL + "/list", data, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer" + " " + localStorage.getItem("access"),
+    },
+  });
 export const updateProduct = (id: any, data: any) =>
   axios.put(REST_API_BASE_URL + "/" + id, data, {
     headers: {

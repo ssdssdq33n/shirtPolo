@@ -32,5 +32,9 @@ export const postCartAndNumber = (size: string, data: any, quantity: number) =>
   });
 export const getAllCart = (username: string | null) =>
   axios.get(REST_API_BASE_URL + "/" + username);
+export const getAllCartShow = (username: string | null) =>
+  axios.get(REST_API_BASE_URL + "/admin/" + username);
+export const getAllCartShowFalse = () =>
+  axios.get(REST_API_BASE_URL + "/adminShow");
 export const deleteCart = (id: number) =>
   axios.delete(REST_API_BASE_URL + "/" + id);

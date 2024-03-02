@@ -22,4 +22,8 @@ export const middleware=(request: NextRequest)=>{
     if(request.nextUrl.pathname.startsWith("/admin") && (!roleToken?.includes("ADMIN"))){
         return NextResponse.redirect(new URL("/errors",request.url))
     }
+    if(request.nextUrl.pathname.startsWith("/account")){
+        request.cookies?.clear()
+        return 
+    }
 }

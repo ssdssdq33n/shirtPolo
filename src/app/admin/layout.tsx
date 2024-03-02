@@ -42,6 +42,12 @@ export default function RegisterLayout({
                 phẩm
               </Link>
             </li>
+            <li className="py-4 flex  hover:bg-[#ccc] hover:text-[#000]">
+              <Link href={"/admin/carts"}>
+                <i className="pi pi-shopping-cart ml-3 mr-2"></i>Quản lý đơn
+                hàng
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

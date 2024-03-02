@@ -11,6 +11,7 @@ import { mutate } from "swr";
 // import { BlobToBase64 } from "@/components/convertBase64/conver";
 import {
   createProduct,
+  createProductImport,
   deleteProduct,
   getAllProduct,
   nodeService,
@@ -18,9 +19,16 @@ import {
 } from "./ProductService";
 import { useEffect, useState } from "react";
 import ProductThaoTac from "./saveOrEdit";
-import { getAllCategories } from "../categories/categoryService";
+import {
+  getAllCategories,
+  getCategoryName,
+} from "../categories/categoryService";
 import { Image } from "primereact/image";
 import { useRouter } from "next/navigation";
+import { exportExcelFileExcel } from "../excel";
+import { excelType } from "../contant";
+import { FileUpload } from "primereact/fileupload";
+import { ExcelRenderer } from "react-excel-renderer";
 
 const Products = () => {
   const [products, setProduct] = useState<IProduct[]>([]);
@@ -29,6 +37,8 @@ const Products = () => {
   const [visible, setVisible] = useState<boolean>(false);
   const [dataSize, setSize] = useState<ISize[]>([]);
   const [dataCate, setCate] = useState<ICategory[]>([]);
+  const [showImport, setShowImport] = useState<boolean>(false);
+  const [dataImport, setDataImport] = useState<any>([]);
   // const [filebase64, setFileBase64] = useState<string>("");
   const [productDialog, setProductDialog] = useState<
     AddOrUpdate<Partial<IProduct>>
@@ -66,7 +76,6 @@ const Products = () => {
     setSize(nodeService.getDataSize());
   }, [renderData]);
   const handleDelete = () => {
-    setLoading(true);
     deleteProduct(data?.productId)
       .then((res) => {
         if ((res.data = "thanh cong")) {
@@ -78,9 +87,12 @@ const Products = () => {
         } else {
           toast.error("Xóa không thành công");
         }
-        setLoading(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        toast.error("Không thể xóa sản phẩm này");
+        setVisible(false);
+      });
   };
   const sizeBody = (rowData: IProduct) => {
     let data = dataSize.find((item) => item.key === rowData.size);
@@ -127,7 +139,7 @@ const Products = () => {
       </>
     );
   };
-  console.log(isLoading);
+  console.log(products);
   const callbackEditProduct = (data: IProduct) => {
     console.log(data);
     setLoading(true);
@@ -151,22 +163,178 @@ const Products = () => {
   const handleCallbackAddData = (data: IProduct) => {
     console.log(data);
     setLoading(true);
-    createProduct(data).then((res) => {
-      if (res) {
-        setRenderData(!renderData);
-        setProduct([...products]);
-        setProductDialog({
-          header: "",
-          visible: false,
-          defaultValues: {},
-        });
+    createProduct(data)
+      .then((res) => {
+        if (res.data === "ton tai") {
+          setProductDialog({
+            header: "",
+            visible: false,
+            defaultValues: {},
+          });
+          setLoading(false);
+          toast.error("Sản phẩm đã tồn tại !");
+        } else if (res.data !== "ton tai") {
+          setRenderData(!renderData);
+          setProduct([...products]);
+          setProductDialog({
+            header: "",
+            visible: false,
+            defaultValues: {},
+          });
+          setLoading(false);
+          mutate("http://localhost:8080/products");
+          toast.success("Thêm mới sản phẩm thành công !");
+        } else {
+          toast.error("Không thành công !");
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
         setLoading(false);
-        mutate("http://localhost:8080/products");
-        toast.success("Thêm mới sản phẩm thành công !");
-      } else {
         toast.error("Không thành công !");
+      });
+  };
+  const headerProduct = [
+    "STT",
+    "Tên sản phẩm",
+    "Sale",
+    "Giá tiền",
+    "Loại sản phẩm",
+    "Nội dung",
+  ];
+  const title = "Danh sách sản phẩm";
+  let fileUploaderRef: any = null;
+  const showErrorFile = () => {
+    toast.error("Không đúng định dạng .xlsx,xls hoặc sản phẩm");
+    fileUploaderRef.clear();
+  };
+  const importExcelFile = (event: any) => {
+    if (event && event.files && event.files[0]) {
+      let file = event.files[0];
+      if (
+        file.type !==
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      ) {
+        showErrorFile();
+        return;
+      } else {
+        ExcelRenderer(event.files[0], (err: any, resp: any) => {
+          if (err) {
+            showErrorFile();
+            return;
+          } else {
+            const { rows } = resp;
+            let resultList: any = [];
+            console.log(rows);
+            if (rows.length > 500) {
+              showErrorFile();
+              return;
+            } else {
+              rows.map((item: any, index: number) => {
+                if (index == 2) {
+                  if (
+                    item[0].indexOf("STT") == "-1" ||
+                    item[1].indexOf("Tên sản phẩm") == "-1" ||
+                    item[2].indexOf("Sale") == "-1" ||
+                    item[3].indexOf("Giá tiền") == "-1" ||
+                    item[4].indexOf("Loại sản phẩm") == "-1" ||
+                    item[5].indexOf("Nội dung") == "-1"
+                  ) {
+                    // showErrorFile();
+                    return showErrorFile();
+                  }
+                }
+                if (
+                  index > 2 &&
+                  typeof item[0] === "number" &&
+                  item[1] &&
+                  item[2] &&
+                  item[3] &&
+                  item[4] &&
+                  item[5]
+                ) {
+                  let obj = {
+                    name: item[1],
+                    sale: item[2],
+                    price: item[3],
+                    category: item[4],
+                    decription: item[5],
+                  };
+                  resultList.push(obj);
+                }
+              });
+              // props.parentImportFile(event);
+              if (resultList.length > 0) {
+                setDataImport(resultList);
+                setShowImport(true);
+              }
+            }
+          }
+        });
+      }
+    } else {
+      showErrorFile();
+    }
+  };
+  const bodyStatus = (rowData: any) => {
+    let dataFind = products.find(
+      (item: any) => item["name"] === rowData["name"]
+    );
+    let dataFindImport = dataImport.filter(
+      (item: any) => item["name"] === rowData["name"]
+    );
+    if (dataFind) {
+      return (
+        <h2 className="text-[red] opacity-[0.7]">Đã tồn tại trên hệ thống</h2>
+      );
+    }
+    if (dataFindImport?.length > 1) {
+      return (
+        <h2 className="text-[red] opacity-[0.7]">
+          Trùng với dữ liệu trong bảng
+        </h2>
+      );
+    }
+    if (dataFindImport?.length === 1 && !dataFind) {
+      console.log(rowData);
+      return <h2 className="text-[#02D58A]">Thành công !</h2>;
+    }
+  };
+  const handleSaveDate = () => {
+    let arr: any = [];
+    dataImport.map((rowData: any) => {
+      let dataFind = products.find(
+        (item: any) => item["name"] === rowData["name"]
+      );
+      let dataFindImport = dataImport.filter(
+        (item: any) => item["name"] === rowData["name"]
+      );
+      if (!dataFind && dataFindImport?.length === 1) {
+        arr.push(rowData);
       }
     });
+    console.log(arr);
+    if (arr?.length > 0) {
+      createProductImport(arr)
+        .then((res) => {
+          if (res) {
+            setShowImport(false);
+            setRenderData(!renderData);
+            fileUploaderRef.clear();
+            toast.success("Lưu thành công");
+          }
+        })
+        .catch((err) => {
+          setShowImport(false);
+          console.log(err);
+          toast.error("Lưu không thành công");
+        });
+    } else {
+      setShowImport(false);
+      toast.error("Không có sản phẩm nào được lưu");
+      fileUploaderRef.clear();
+    }
   };
   return (
     <div className="h-full">
@@ -187,21 +355,50 @@ const Products = () => {
               })
             }
             id="name"
-            placeholder=""
+            placeholder="   name"
             className="w-full h-full border-1"
           />
         </span>
-        <Button
-          label="Thêm mới"
-          className="w-[130px] h-[40px] text-[#fff] bg-[#475569]"
-          onClick={() => {
-            setProductDialog({
-              header: "Thêm mới sản phẩm",
-              visible: true,
-              defaultValues: {},
-            });
-          }}
-        />
+        <div className="flex align-items-center">
+          <FileUpload
+            ref={(ref) => {
+              fileUploaderRef = ref;
+            }}
+            className="w-[130px] h-[40px] text-[#fff] mr-2"
+            mode="basic"
+            name="demo[]"
+            chooseLabel="Import"
+            url="/api/upload"
+            accept=".xls, .xlsx"
+            maxFileSize={1000000}
+            onSelect={(e) => importExcelFile(e)}
+          />
+          <Button
+            label="Export"
+            className="w-[130px] h-[40px] text-[#fff] bg-[#BE912D] mr-2"
+            onClick={() => {
+              exportExcelFileExcel(
+                title,
+                "Products",
+                headerProduct,
+                excelType.Product,
+                products,
+                dataCate
+              );
+            }}
+          />
+          <Button
+            label="Thêm mới"
+            className="w-[130px] h-[40px] text-[#fff] bg-[#475569]"
+            onClick={() => {
+              setProductDialog({
+                header: "Thêm mới sản phẩm",
+                visible: true,
+                defaultValues: {},
+              });
+            }}
+          />
+        </div>
       </div>
       {isLoading && <Loading />}
       {!isLoading && (
@@ -278,6 +475,40 @@ const Products = () => {
             label="Không"
           />
         </div>
+      </Dialog>
+      <Dialog
+        // header="Bạn có chắc chắn muốn xóa"
+        visible={showImport}
+        style={{ width: "50vw" }}
+        onHide={() => setShowImport(false)}
+      >
+        <>
+          <div>
+            <DataTable value={dataImport} tableStyle={{ minWidth: "50rem" }}>
+              <Column field="name" header="Tên sản phẩm"></Column>
+              <Column field="sale" header="Sale"></Column>
+              <Column field="price" header="Giá tiền"></Column>
+              <Column field="category" header="Loại sản phẩm"></Column>
+              <Column field="description" header="Nội dung"></Column>
+              <Column body={bodyStatus} header="Trạng thái"></Column>
+            </DataTable>
+          </div>
+          <div className="flex justify-around mt-3">
+            <Button
+              className="text-[#fff] bg-[#0891B2] w-[25%]"
+              onClick={handleSaveDate}
+              label="Lưu"
+            />
+            <Button
+              className=" text-[#fff] bg-[#475569] w-[25%]"
+              onClick={() => {
+                setShowImport(false);
+                fileUploaderRef.clear();
+              }}
+              label="Không"
+            />
+          </div>
+        </>
       </Dialog>
       <ProductThaoTac
         dataCate={dataCate}

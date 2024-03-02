@@ -8,6 +8,7 @@ import { Button } from "primereact/button";
 import "../phieu-qua-tang/phieu-qua.css";
 import logo from "./images/phieu-qua-tang.webp";
 import anhqua from "./images/phieuquatang.jpg";
+import LienHe from "@/components/lienhe/LienHe";
 const PhieuQuaTang = () => {
   const [selectedCity, setSelectedCity] = useState<any>(null);
   const cities = [
@@ -107,6 +108,7 @@ const PhieuQuaTang = () => {
           </Card>
         </div>
       </div>
+      <LienHe />
     </>
   );
 };
