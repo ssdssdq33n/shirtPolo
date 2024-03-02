@@ -20,6 +20,9 @@ type FormData = {
   city: string;
   district: string;
   ward: string;
+  total: string;
+  username: string | null;
+  carts: any;
 };
 const CheckOut = () => {
   const form = useRef<any>();
@@ -38,6 +41,8 @@ const CheckOut = () => {
       city: "",
       district: "",
       ward: "",
+      total: "",
+      username: "",
     },
   });
   const router = useRouter();
@@ -50,6 +55,9 @@ const CheckOut = () => {
   const [valueDistrict, setValueDistrice] = useState<any>([]);
   const [dataWard, setWard] = useState<any>([]);
   const [valueWard, setValueWard] = useState<any>([]);
+  const [error1, setError1] = useState<boolean>(false);
+  const [error3, setError3] = useState<boolean>(false);
+  const [error2, setError2] = useState<boolean>(false);
   useEffect(() => {
     getAllCart(localStorage.getItem("username"))
       .then((res) => {
@@ -122,8 +130,49 @@ const CheckOut = () => {
       </div>
     );
   };
-  const SubmitForm = (data: any) => {
-    console.log(data);
+  const SubmitForm = (data: FormData) => {
+    console.log(valueCity["province_name"]?.length);
+    if (valueCity["province_name"]?.length === undefined) {
+      setError1(true);
+    } else {
+      setError1(false);
+    }
+    if (valueDistrict["district_name"]?.length === undefined) {
+      setError2(true);
+    } else {
+      setError2(false);
+    }
+    if (valueWard["ward_name"]?.length === undefined) {
+      setError3(true);
+    } else {
+      setError3(false);
+    }
+    if (
+      valueWard["ward_name"]?.length > 0 &&
+      valueCity["province_name"]?.length > 0 &&
+      valueDistrict["district_name"]?.length > 0
+    ) {
+      data["city"] = valueCity["province_name"];
+      data["district"] = valueDistrict["district_name"];
+      data["ward"] = valueWard["ward_name"];
+      data["total"] = `${coin !== undefined ? coin + 25000 : 0}`;
+      data["username"] = localStorage.getItem("username");
+      data["carts"] = dataCart;
+      console.log(data);
+      axios
+        .post("http://localhost:8080/details", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer" + " " + localStorage.getItem("access"),
+          },
+        })
+        .then((res) => {
+          if (res.data) {
+            router.push("/succes");
+          }
+        })
+        .catch((err) => console.log(err));
+    }
   };
   return (
     <>
@@ -245,33 +294,66 @@ const CheckOut = () => {
                 <div className="mt-3 flex justify-between align-items-center">
                   <div className="w-[32%]">
                     <Dropdown
-                      onChange={(e) => setValueCity(e.target.value)}
+                      onChange={(e) => {
+                        setValueCity(e.target.value);
+                        if (e.target.value["province_name"]?.length > 0) {
+                          setError1(false);
+                        }
+                      }}
                       value={valueCity}
                       options={dataCity}
                       optionLabel="province_name"
                       placeholder="Tỉnh / thành"
                       className="w-full h-3rem border-2 border-noround bg-[#fff] focus:bg-[#fff]"
                     />
+                    {error1 && (
+                      <p className="text-[red] font-[500] text-[15px]">
+                        <i className="pi pi-exclamation-triangle"></i> Vui lòng
+                        chọn tỉnh/thành
+                      </p>
+                    )}
                   </div>
                   <div className="w-[32%]">
                     <Dropdown
-                      onChange={(e) => setValueDistrice(e.target.value)}
+                      onChange={(e) => {
+                        setValueDistrice(e.target.value);
+                        if (e.target.value["district_name"]?.length > 0) {
+                          setError2(false);
+                        }
+                      }}
                       value={valueDistrict}
                       options={dataDistrict}
                       optionLabel="district_name"
                       placeholder="Quận / huyện"
                       className="w-full h-3rem border-2 border-noround bg-[#fff] focus:bg-[#fff]"
                     />
+                    {error2 && (
+                      <p className="text-[red] font-[500] text-[15px]">
+                        <i className="pi pi-exclamation-triangle"></i> Vui lòng
+                        chọn quận/huyện
+                      </p>
+                    )}
                   </div>
                   <div className="w-[32%]">
                     <Dropdown
-                      onChange={(e) => setValueWard(e.target.value)}
+                      onChange={(e) => {
+                        if (e.target.value["ward_name"]?.length > 0) {
+                          setError3(false);
+                        }
+                        setValueWard(e.target.value);
+                      }}
                       value={valueWard}
                       options={dataWard}
                       optionLabel="ward_name"
                       placeholder="Phường / xã"
                       className="w-full h-3rem border-2 border-noround bg-[#fff] focus:bg-[#fff]"
                     />
+                    {error3 && (
+                      <p className="text-[red] font-[500] text-[15px]">
+                        <i className="pi pi-exclamation-triangle"></i> Vui lòng
+                        chọn phường/xã
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex justify-between align-items-center mt-4 mb-5">
@@ -343,14 +425,15 @@ const CheckOut = () => {
                 </div>
                 <div className="flex justify-between mt-1">
                   <p className="text-[14px] opacity-[0.7]">Phí vận chuyển</p>
-                  <p className="text-[15px]">{coin}₫</p>
+                  <p className="text-[15px]">25,000₫</p>
                 </div>
               </div>
             </div>
             <div className="mt-4 flex justify-between">
               <h2 className="text-[17px]">Tổng cộng</h2>
               <h2 className="text-[20px] font-[600] opacity-[0.8]">
-                <span className="text-[#C8C8C8] text-[14px]">VND</span> {coin}₫
+                <span className="text-[#C8C8C8] text-[14px]">VND</span>{" "}
+                {coin !== undefined ? coin + 25000 : 0}₫
               </h2>
             </div>
           </div>

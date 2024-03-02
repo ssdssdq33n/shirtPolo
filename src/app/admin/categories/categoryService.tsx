@@ -15,8 +15,22 @@ export const getCategory = (id: any) =>
       Authorization: "Bearer" + " " + localStorage.getItem("access"),
     },
   });
+export const getCategoryName = (name: any) =>
+  axios.get(REST_API_BASE_URL + "/ten/" + name, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer" + " " + localStorage.getItem("access"),
+    },
+  });
 export const createCategory = (data: any) =>
   axios.post(REST_API_BASE_URL, data, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer" + " " + localStorage.getItem("access"),
+    },
+  });
+export const createCategoryList = (data: any) =>
+  axios.post(REST_API_BASE_URL + "/list", data, {
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer" + " " + localStorage.getItem("access"),

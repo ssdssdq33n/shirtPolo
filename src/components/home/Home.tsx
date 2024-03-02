@@ -89,7 +89,12 @@ const HomePage = () => {
   }, []);
   const header = (srcs: string) => {
     return (
-      <Image src={srcs} className="w-full image cursor-pointer" alt="Image" />
+      <Image
+        src={srcs}
+        className="w-full image cursor-pointer"
+        height="200"
+        alt="Image"
+      />
     );
   };
   const headerImage = (id: number) => {
@@ -148,6 +153,10 @@ const HomePage = () => {
         .catch((err) => console.log(err));
     }
   };
+  // console.log(value);
+  // if (value === 0) {
+  //   value = 1;
+  // }
   return (
     <>
       <ToastContainer />
@@ -316,7 +325,9 @@ const HomePage = () => {
                       alt="Image"
                     />
                     <div>
-                      <p className="text-[13px]">{item?.description}</p>
+                      <p className="text-[13px] surface-overlay overflow-hidden text-overflow-ellipsis white-space-wrap w-[150px] h-[40px]">
+                        {item?.description}
+                      </p>
                       <div className="flex justify-between mt-1 w-[140px]">
                         <p className="text-[red] text-[12px] font-[600]">
                           {item?.price}
@@ -353,12 +364,12 @@ const HomePage = () => {
                 )}
                 className="w-full"
               >
-                <h2 className="font-[600] text-[15px]">
+                <h2 className="font-[600] text-[15px]  surface-overlay overflow-hidden text-overflow-ellipsis white-space-wrap w-[100%] h-3rem">
                   Gợi ý bạn kiểu áo len nam đẹp khi mùa đông về
                 </h2>
-                <p className="text-[14px]">
+                <p className="text-[14px] surface-overlay overflow-hidden text-overflow-ellipsis white-space-nowrap w-[100%] h-2rem">
                   Trang phục len không chỉ có thể giữ ấm cho cơ thể mà còn làm
-                  rất tốt nhiệm vụ...
+                  rất tốt nhiệm vụ
                 </p>
                 <div className="mt-3 flex justify-between border-top-1 border-bluegray-400">
                   <p className="flex text-[12px] mt-2 opacity-7">
@@ -377,10 +388,10 @@ const HomePage = () => {
                 )}
                 className="w-full"
               >
-                <h2 className="font-[600] text-[15px]">
+                <h2 className="font-[600] text-[15px] surface-overlay overflow-hidden text-overflow-ellipsis white-space-wrap w-[100%] h-3rem">
                   Mừng khai trương showroom merriman quảng ngãi
                 </h2>
-                <p className="text-[14px]">
+                <p className="text-[14px] surface-overlay overflow-hidden text-overflow-ellipsis white-space-nowrap w-[100%] h-2rem">
                   Tiếp nối sự thành công của chuỗi showroom merriman trải khắp
                   Bắc-Trung-Nam
                 </p>
@@ -401,12 +412,12 @@ const HomePage = () => {
                 )}
                 className="w-full"
               >
-                <h2 className="font-[600] text-[15px]">
+                <h2 className="font-[600] text-[15px] surface-overlay overflow-hidden text-overflow-ellipsis white-space-wrap w-[100%] h-3rem">
                   Đổi gió phong cách công sở cùng quần Kaki nam
                 </h2>
-                <p className="text-[14px]">
+                <p className="text-[14px] surface-overlay overflow-hidden text-overflow-ellipsis white-space-nowrap w-[100%] h-2rem">
                   Một trong những items luôn đứng top sản phẩm bán chạy nhất tại
-                  Merriman chắc ...
+                  Merriman chắc
                 </p>
                 <div className="mt-3 flex justify-between border-top-1 border-bluegray-400">
                   <p className="flex text-[12px] mt-2 opacity-7">
@@ -425,12 +436,12 @@ const HomePage = () => {
                 )}
                 className="w-full"
               >
-                <h2 className="font-[600] text-[15px]">
+                <h2 className="font-[600] text-[15px] surface-overlay overflow-hidden text-overflow-ellipsis white-space-wrap w-[100%] h-3rem">
                   Khám phá phong cách thời trang của quý ông
                 </h2>
-                <p className="text-[14px]">
+                <p className="text-[14px] surface-overlay overflow-hidden text-overflow-ellipsis white-space-nowrap w-[100%] h-2rem">
                   Ngày nay, đâu chỉ riêng phụ nữ mà đến cả các quý ông hiện đại
-                  cũng rất để ý...
+                  cũng rất để ý
                 </p>
                 <div className="mt-3 flex justify-between border-top-1 border-bluegray-400">
                   <p className="flex text-[12px] mt-2 opacity-7">
@@ -447,7 +458,7 @@ const HomePage = () => {
       </div>
       <Dialog
         visible={visible}
-        // style={{ width: "50vw" }}
+        style={{ width: "50vw" }}
         onHide={() => setVisible(false)}
       >
         <div className="grid flex my-0 ">
@@ -478,7 +489,7 @@ const HomePage = () => {
               </div>
             </div>
             <div className="mt-4 flex">
-              <h2 className="text-[20px] font-[500] ml-3 flex justify-start align-items-center w-[30%]">
+              <h2 className="text-[17px] font-[500] ml-3 flex justify-start align-items-center w-[30%]">
                 {" "}
                 Kích thước:
               </h2>
@@ -496,32 +507,25 @@ const HomePage = () => {
                       />
                       <label
                         htmlFor={item.key}
-                        className="ml-1  cursor-pointer text-[20px] font-[600] opacity-[0.7]"
+                        className="ml-0  cursor-pointer text-[16px] font-[600] opacity-[0.7]"
                       >
                         {item.value}
                       </label>
                     </div>
-                    // <p
-                    //   onClick={() => {
-                    //     console.log(item.value);
-                    //   }}
-                    //   key={index}
-                    //   className=" text-[#F0E68C] cursor-pointer text-[20px] font-[600] w-3rem flex justify-center align-items-center border-1 border-[#F0E68C] rounded-md"
-                    // >
-                    //   {item?.value}
-                    // </p>
                   );
                 })}
               </div>
             </div>
             <div className="mt-4 flex">
-              <h2 className="text-[20px] font-[500] ml-3 flex justify-start align-items-center w-[30%]">
+              <h2 className="text-[17px] font-[500] ml-3 flex justify-start align-items-center w-[30%]">
                 {" "}
                 Số lượng:
               </h2>
               <InputNumber
                 value={value}
-                onValueChange={(e: any) => setValue(e.target.value)}
+                onValueChange={(e: any) => {
+                  setValue(e.target.value);
+                }}
                 showButtons
                 buttonLayout="horizontal"
                 // style={{ width: "3rem" }}

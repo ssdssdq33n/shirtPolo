@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import "./login.css";
 import { ToastContainer, toast } from "react-toastify";
 import { loginUser } from "./loginService";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { getEmail } from "../register/userService";
 import XacThucEmail from "./Xacthuc";
@@ -35,11 +35,12 @@ const Login = () => {
       password: "",
     },
   });
-  // console.log(watch("username"));
-  const handleLogin = (data: any) => {
+  useEffect(() => {
     localStorage.clear();
     Cookies.remove("access-token");
     Cookies.remove("role-token");
+  }, []);
+  const handleLogin = (data: any) => {
     loginUser(data)
       .then((res) => {
         if (res) {
